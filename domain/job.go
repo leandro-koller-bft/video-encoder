@@ -28,7 +28,6 @@ func NewJob(output string, status string, video *Video) (*Job, error) {
 	job.prepare()
 
 	err := job.Validate()
-
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +43,6 @@ func (job *Job) prepare() {
 
 func (job *Job) Validate() error {
 	_, err := govalidator.ValidateStruct(job)
-
 	if err != nil {
 		return err
 	}

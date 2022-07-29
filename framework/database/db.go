@@ -35,7 +35,6 @@ func NewDBTest() *gorm.DB {
 	dbInstance.Debug = true
 
 	connection, err := dbInstance.Connect()
-
 	if err != nil {
 		log.Fatalf("Test db error: %v", err)
 	}
@@ -51,7 +50,6 @@ func (db *Database) Connect() (*gorm.DB, error) {
 	} else {
 		db.DB, err = gorm.Open(db.DBTypeTest, db.DSNTest)
 	}
-
 	if err != nil {
 		return nil, err
 	}
