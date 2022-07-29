@@ -1,3 +1,4 @@
 .vscode
 sqlite.db
 .env
+*-key.json
