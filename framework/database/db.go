@@ -5,8 +5,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/leandro-koller-bft/video-encoder/constants"
 	"github.com/leandro-koller-bft/video-encoder/domain"
+	"github.com/leandro-koller-bft/video-encoder/local_constants"
 	_ "github.com/lib/pq"
 )
 
@@ -28,7 +28,7 @@ func NewDB() *Database {
 func NewDBTest() *gorm.DB {
 	dbInstance := NewDB()
 
-	dbInstance.Env = constants.TEST_TOKEN
+	dbInstance.Env = local_constants.TEST_TOKEN
 	dbInstance.DBTypeTest = "sqlite3"
 	dbInstance.DSNTest = ":memory:"
 	dbInstance.AutoMigrateDB = true
@@ -45,7 +45,7 @@ func NewDBTest() *gorm.DB {
 func (db *Database) Connect() (*gorm.DB, error) {
 	var err error
 
-	if db.Env != constants.TEST_TOKEN {
+	if db.Env != local_constants.TEST_TOKEN {
 		db.DB, err = gorm.Open(db.DBType, db.DSN)
 	} else {
 		db.DB, err = gorm.Open(db.DBTypeTest, db.DSNTest)
