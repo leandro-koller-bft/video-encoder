@@ -1,7 +1,17 @@
 version: '3'
 
 services:
-  app:
-    build: .
-    volumes:
-      - .:/go/src/
+  rabbit:
+    image: "rabbitmq:3-management"
+    environment:
+      RABBIT_ERLANG_COOKIE: "IOAHOUASOHASOH"
+      RABBIT_DEFAULT_USER: "rabbitmq"
+      RABBIT_DEFAULT_PASS: "rabbitmq"
+      RABBIT_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+  # app:
+  #   build: .
+  #   volumes:
+  #     - .:/go/src/

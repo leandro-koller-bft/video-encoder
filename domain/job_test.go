@@ -16,7 +16,7 @@ func TestNewJob(t *testing.T) {
 	video.FilePath = "path"
 	video.CreatedAt = time.Now()
 
-	job, err := domain.NewJob("path", "Converted", video)
+	job, err := domain.NewJob("path", video)
 
 	require.NotNil(t, job)
 	require.Nil(t, err)

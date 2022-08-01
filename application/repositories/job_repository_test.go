@@ -24,7 +24,7 @@ func TestJobRepository_InsertFind(t *testing.T) {
 	repoV := repositories.VideoRepository{DB: db}
 	repoV.Insert(video)
 
-	job, err := domain.NewJob("output_path", "status", video)
+	job, err := domain.NewJob("output_path", video)
 	require.Nil(t, err)
 
 	repoJ := repositories.JobRepository{DB: db}
@@ -50,7 +50,7 @@ func TestJobRepository_Update(t *testing.T) {
 	repoV := repositories.VideoRepository{DB: db}
 	repoV.Insert(video)
 
-	job, err := domain.NewJob("output_path", local_constants.PENDING_STATUS, video)
+	job, err := domain.NewJob("output_path", video)
 	require.Nil(t, err)
 
 	repoJ := repositories.JobRepository{DB: db}

@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com/leandro-koller-bft/video-encoder/local_constants"
 	uuid "github.com/satori/go.uuid"
 
 	"github.com/asaskevich/govalidator"
@@ -19,10 +20,9 @@ type Job struct {
 	UpdatedAt        time.Time `json:"updated_at" valid:"-"`
 }
 
-func NewJob(output string, status string, video *Video) (*Job, error) {
+func NewJob(output string, video *Video) (*Job, error) {
 	job := Job{
 		OutputBucketPath: output,
-		Status:           status,
 		Video:            video,
 	}
 	job.prepare()
@@ -39,6 +39,7 @@ func (job *Job) prepare() {
 	job.ID = uuid.NewV4().String()
 	job.CreatedAt = time.Now()
 	job.UpdatedAt = time.Now()
+	job.Status = local_constants.JOB_STARTING
 }
 
 func (job *Job) Validate() error {
