@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -41,7 +42,8 @@ func NewRabbitMQ() *RabbitMQ {
 }
 
 func (r *RabbitMQ) Connect() *amqp.Channel {
-	dsn := "amqp://" + r.User + ":" + r.Password + "@" + r.Host + ":" + r.Port + r.Vhost
+	dsn := "amqp://" + r.User + ":" + r.Password + "@" + ":" + r.Port + r.Vhost
+	fmt.Println(dsn)
 	conn, err := amqp.Dial(dsn)
 	failOnError(err, "Failed to connect to RabbitMQ")
 

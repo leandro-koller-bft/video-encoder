@@ -15,4 +15,11 @@ const (
 	RABBIT_MQ_CONSUMER_NAME_ENV            = "RABBIT_MQ_CONSUMER_NAME"
 	RABBIT_MQ_NOTIFICATION_EX_ENV          = "RABBIT_MQ_NOTIFICATION_EX"
 	RABBIT_MQ_NOTIFICATION_ROUTING_KEY_ENV = "RABBIT_MQ_NOTIFICATION_ROUTING_KEY"
+	AUTO_MIGRATE_DB_ENV                    = "AUTO_MIGRATE_DB"
+	DSN_TEST_ENV                           = "DSN_TEST"
+	DSN_ENV                                = "DSN"
+	DB_TYPE_TEST_ENV                       = "DB_TYPE_TEST"
+	DB_TYPE_ENV                            = "DB_TYPE"
+	ENV_ENV                                = "ENV"
+	DEBUG_ENV                              = "DEBUG"
 )

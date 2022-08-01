@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/jinzhu/gorm"
 	"github.com/leandro-koller-bft/video-encoder/application/repositories"
@@ -20,6 +21,7 @@ type JobManager struct {
 	MessageChannel   chan amqp.Delivery
 	JobReturnChannel chan JobWorkerResult
 	RabbitMQ         *queue.RabbitMQ
+	Mutex            sync.Mutex
 }
 
 type JobNotificationError struct {
@@ -31,10 +33,15 @@ func NewJobManager(
 	db *gorm.DB,
 	rabbitMQ *queue.RabbitMQ,
 	jobReturnChannel chan JobWorkerResult,
-	messageChannel chan amqp.Delivery) *JobManager {
+	messageChannel chan amqp.Delivery,
+) *JobManager {
+	job, err := domain.NewJob(local_constants.STORAGE_NAME, domain.NewVideo())
+	if err != nil {
+		log.Fatalf("failed creating job and video")
+	}
 	return &JobManager{
 		DB:               db,
-		Domain:           domain.Job{}, // reform
+		Domain:           *job,
 		MessageChannel:   messageChannel,
 		JobReturnChannel: jobReturnChannel,
 		RabbitMQ:         rabbitMQ,
@@ -72,7 +79,9 @@ func (j *JobManager) Start(ch *amqp.Channel) {
 }
 
 func (j *JobManager) notifySuccess(jobResult JobWorkerResult, ch *amqp.Channel) error {
+	j.Mutex.Lock()
 	jobJson, err := json.Marshal(jobResult.Job)
+	j.Mutex.Unlock()
 	if err != nil {
 		return err
 	}
@@ -81,7 +90,6 @@ func (j *JobManager) notifySuccess(jobResult JobWorkerResult, ch *amqp.Channel) 
 	if err != nil {
 		return err
 	}
-
 	err = jobResult.Message.Ack(false)
 
 	return err
@@ -89,7 +97,19 @@ func (j *JobManager) notifySuccess(jobResult JobWorkerResult, ch *amqp.Channel) 
 
 func (j *JobManager) checkParseErrors(jobResult JobWorkerResult) error {
 	if jobResult.Job.ID != "" {
-		log.Panicf("MessageID #{jobResult.Message.DeliveryTag}. Error with job: #{jobResult.Job.ID}")
+		log.Panicf(
+			"MessageID %v. Error with job: %v with video %v. Error: %v",
+			jobResult.Message.DeliveryTag,
+			jobResult.Job.ID,
+			jobResult.Job.VideoID,
+			jobResult.Error.Error(),
+		)
+	} else {
+		log.Panicf(
+			"MessageID %v. Error parsing message: %v.",
+			jobResult.Message.DeliveryTag,
+			jobResult.Error.Error(),
+		)
 	}
 
 	errorMsg := JobNotificationError{

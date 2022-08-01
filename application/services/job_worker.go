@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"sync"
 
 	"github.com/leandro-koller-bft/video-encoder/domain"
 	"github.com/leandro-koller-bft/video-encoder/framework/utils"
@@ -15,6 +16,8 @@ type JobWorkerResult struct {
 	Message *amqp.Delivery
 	Error   error
 }
+
+var Mutex = &sync.Mutex{}
 
 func JobWorker(
 	messageChannel chan amqp.Delivery,
@@ -31,8 +34,10 @@ func JobWorker(
 			continue
 		}
 		// get message from body
+		Mutex.Lock()
 		err = json.Unmarshal(message.Body, &jobService.VideoService.Video)
 		jobService.VideoService.Video.ID = uuid.NewV4().String()
+		Mutex.Unlock()
 		if err != nil {
 			returnChannel <- returnJobResult(domain.Job{}, message, err)
 			continue
@@ -44,7 +49,9 @@ func JobWorker(
 			continue
 		}
 		// insert video on database
+		Mutex.Lock()
 		err = jobService.VideoService.InsertVideo()
+		Mutex.Unlock()
 		if err != nil {
 			returnChannel <- returnJobResult(domain.Job{}, message, err)
 			continue
@@ -54,7 +61,9 @@ func JobWorker(
 		job.OutputBucketPath = local_constants.STORAGE_NAME
 		job.Status = local_constants.JOB_STARTING
 
+		Mutex.Lock()
 		_, err = jobService.JobRepository.Insert(&job)
+		Mutex.Unlock()
 		if err != nil {
 			returnChannel <- returnJobResult(domain.Job{}, message, err)
 			continue
